@@ -3,23 +3,37 @@ package org.example.page;
 import org.example.model.UserCredentials;
 import org.openqa.selenium.By;
 
-import com.codeborne.selenide.SelenideElement;
+import static com.codeborne.selenide.Selenide.closeWindow;
+import static com.codeborne.selenide.Selenide.open;
 
-import static com.codeborne.selenide.Selenide.$;
-
-public class LoginPage extends Page {
-    private static final String URL = "https://ok.ru/";
-    private final SelenideElement emailOrPhoneNumberInput = $(By.id("field_email"));
-    private final SelenideElement passwordInput = $(By.id("field_password"));
-    private final SelenideElement loginButton = $(By.cssSelector(".login-form-actions input[type='submit']"));
+public class LoginPage extends Page<LoginPage> {
+    private static final By LOGIN_BUTTON_PATH = By.cssSelector("[data-l='t,sign_in']");
+    private static final By EMAIL_OR_PHONE_NUMBER_INPUT = By.id("field_email");
+    private static final By PASSWORD_INPUT = By.id("field_password");
 
     public LoginPage() {
-        super(URL);
+        load();
     }
 
-    public void login(UserCredentials userCredentials) {
-        emailOrPhoneNumberInput.setValue(userCredentials.emailOrPhoneNumber());
-        passwordInput.setValue(userCredentials.password());
-        loginButton.click();
+    @Override
+    public void close() {
+        closeWindow();
+    }
+
+    @Override
+    protected void load() {
+        open("https://ok.ru");
+    }
+
+    @Override
+    protected void isLoaded() throws Error {
+        waitTillElementIsLoaded(LOGIN_BUTTON_PATH, "Страница не загружена!");
+    }
+
+    public MainPage login(UserCredentials userCredentials) {
+        waitTillElementIsLoaded(EMAIL_OR_PHONE_NUMBER_INPUT, "Поле логина не отображается!").setValue(userCredentials.emailOrPhoneNumber());
+        waitTillElementIsLoaded(PASSWORD_INPUT,"Поле для пароля не отображается!").setValue(userCredentials.password());
+        waitTillElementIsLoaded(LOGIN_BUTTON_PATH, "Кнопка для логина не отображается!").click();
+        return new MainPage();
     }
 }

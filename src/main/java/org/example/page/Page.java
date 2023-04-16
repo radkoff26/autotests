@@ -1,20 +1,28 @@
 package org.example.page;
 
-import static com.codeborne.selenide.Selenide.closeWindow;
-import static com.codeborne.selenide.Selenide.open;
+import java.time.Duration;
 
-public class Page {
-    private final String url;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.LoadableComponent;
 
-    public Page(String url) {
-        this.url = url;
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.SelenideElement;
+
+import static com.codeborne.selenide.Selenide.$;
+
+public abstract class Page<T extends LoadableComponent<T>> extends LoadableComponent<T> {
+    protected Page() {
+        load();
     }
 
-    public void openPage() {
-        open(url);
+    @Override
+    protected void load() {
+        // Unnecessary to override
     }
 
-    public void closePage() {
-        closeWindow();
+    protected SelenideElement waitTillElementIsLoaded(By by, String message) {
+        return $(by).shouldBe(Condition.visible.because(message), Duration.ofSeconds(10));
     }
+
+    public abstract void close();
 }

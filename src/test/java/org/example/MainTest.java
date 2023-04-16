@@ -1,76 +1,61 @@
 package org.example;
 
+import org.example.components.ChatComponent;
 import org.example.model.BotCredentials;
-import org.example.page.LoginPage;
+import org.example.model.Language;
 import org.example.page.MainPage;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.codeborne.selenide.Selenide.closeWindow;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class MainTest {
-
-    @BeforeAll
-    static void adjust() {
-        final LoginPage loginPage = new LoginPage();
-        loginPage.openPage();
-        loginPage.login(BotCredentials.getBotCredentials());
-    }
+class MainTest extends BaseTest {
 
     @Test
     void loginTest() {
-        final MainPage mainPage = new MainPage();
-
-        assertThat(mainPage.getProfileName(), containsString("botS23AT20"));
+        final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
+        assertThat(mainPage.getProfileName(), containsString(BotCredentials.getBotCredentials().emailOrPhoneNumber()));
     }
 
     @Test
     void languageChangeTest() {
-        final MainPage mainPage = new MainPage();
+        final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
+        final Language prevLanguage = mainPage.getLanguage();
 
-        mainPage.openPage();
-
-        final String prevLanguage = mainPage.getLanguage();
-
-        final String actualLanguage = mainPage
+        final Language actualLanguage = mainPage
+                .openTools()
                 .changeLanguage()
                 .getLanguage();
 
-        assertThat(actualLanguage, equalTo(prevLanguage.equals("English") ? "Русский" : "English"));
+        assertThat(actualLanguage, not(equalTo(prevLanguage)));
     }
 
     @Test
     void chatWorkingTest() {
-        final MainPage mainPage = new MainPage();
+        final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
+        ChatComponent chatComponent = new ChatComponent();
 
-        boolean isOpen = mainPage.checkForChatBeingVisible();
+        assertThrows(Throwable.class, chatComponent::checkForChatBeingVisible, "Чат не должен быть виден!");
 
-        assertFalse(isOpen);
+        mainPage.openChat();
 
-        isOpen = mainPage
-                .openChat()
-                .checkForChatBeingVisible();
+        assertDoesNotThrow(chatComponent::checkForChatBeingVisible, "Чат должен быть виден!");
 
-        assertTrue(isOpen);
+        chatComponent.closeChat();
 
-        isOpen = mainPage
-                .closeChat()
-                .checkForChatBeingVisible();
-
-        assertFalse(isOpen);
+        assertThrows(Throwable.class, chatComponent::checkForChatBeingVisible, "Чат не должен быть виден!");
     }
 
     @Test
     void servicesDropdownTest() {
-        final MainPage mainPage = new MainPage();
-
+        final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
         boolean isDropdownVisible = mainPage.isDropdownVisible();
 
         assertFalse(isDropdownVisible);
@@ -84,8 +69,7 @@ class MainTest {
 
     @Test
     void searchInputTest() {
-        final MainPage mainPage = new MainPage();
-
+        final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
         String inputValue = mainPage.getSearchInputText();
 
         assertEquals("", inputValue);
@@ -100,8 +84,7 @@ class MainTest {
 
     @Test
     void searchInputCollapsingTest() {
-        MainPage mainPage = new MainPage();
-
+        final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
         boolean isCollapsed = mainPage
                 .openSearchInput()
                 .inputSearchText("Text")
@@ -109,10 +92,5 @@ class MainTest {
                 .isSearchInputCollapsed();
 
         assertTrue(isCollapsed);
-    }
-
-    @AfterAll
-    static void tearDown() {
-        closeWindow();
     }
 }
