@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import static com.codeborne.selenide.Selenide.closeWebDriver;
+import static com.codeborne.selenide.Selenide.closeWindow;
 
 public class BaseTest {
     protected LoginPage loginPage;
@@ -17,7 +18,7 @@ public class BaseTest {
 
     @AfterEach
     void close() {
-        loginPage.close();
+        closeWindow();
     }
 
     @AfterAll

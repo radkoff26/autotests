@@ -6,7 +6,6 @@ import org.openqa.selenium.By;
 import com.codeborne.selenide.Condition;
 
 import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.closeWindow;
 
 public class MainPage extends Page<MainPage> {
     // Locators
@@ -21,15 +20,6 @@ public class MainPage extends Page<MainPage> {
     private static final By SERVICE_DROPDOWN_TOGGLE = By.cssSelector(".vk_ecosystem_toolbar");
     private static final By SERVICE_DROPDOWN = By.cssSelector(".vk_ecosystem_toolbar .toolbar_dropdown");
     private static final By SEARCH_INPUT = By.cssSelector("form[role='search'] label input");
-
-    public MainPage() {
-        load();
-    }
-
-    @Override
-    public void close() {
-        closeWindow();
-    }
 
     @Override
     protected void isLoaded() throws Error {

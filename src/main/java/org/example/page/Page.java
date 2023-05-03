@@ -12,7 +12,7 @@ import static com.codeborne.selenide.Selenide.$;
 
 public abstract class Page<T extends LoadableComponent<T>> extends LoadableComponent<T> {
     protected Page() {
-        load();
+        isLoaded();
     }
 
     @Override
@@ -23,6 +23,4 @@ public abstract class Page<T extends LoadableComponent<T>> extends LoadableCompo
     protected SelenideElement waitTillElementIsLoaded(By by, String message) {
         return $(by).shouldBe(Condition.visible.because(message), Duration.ofSeconds(10));
     }
-
-    public abstract void close();
 }

@@ -21,7 +21,11 @@ class MainTest extends BaseTest {
     @Test
     void loginTest() {
         final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
-        assertThat(mainPage.getProfileName(), containsString(BotCredentials.getBotCredentials().emailOrPhoneNumber()));
+        assertThat(
+                "Отображается неверное имя пользователя!",
+                mainPage.getProfileName(),
+                containsString(BotCredentials.getBotCredentials().emailOrPhoneNumber())
+        );
     }
 
     @Test
@@ -34,7 +38,7 @@ class MainTest extends BaseTest {
                 .changeLanguage()
                 .getLanguage();
 
-        assertThat(actualLanguage, not(equalTo(prevLanguage)));
+        assertThat("Язык не изменился!", actualLanguage, not(equalTo(prevLanguage)));
     }
 
     @Test
@@ -58,13 +62,13 @@ class MainTest extends BaseTest {
         final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
         boolean isDropdownVisible = mainPage.isDropdownVisible();
 
-        assertFalse(isDropdownVisible);
+        assertFalse(isDropdownVisible, "Выпадающий виджет виден!");
 
         isDropdownVisible = mainPage
                 .openServices()
                 .isDropdownVisible();
 
-        assertTrue(isDropdownVisible);
+        assertTrue(isDropdownVisible, "Выпадающий виджет не виден!");
     }
 
     @Test
@@ -72,25 +76,26 @@ class MainTest extends BaseTest {
         final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
         String inputValue = mainPage.getSearchInputText();
 
-        assertEquals("", inputValue);
+        assertEquals("", inputValue, "Поисковая строка не пустая!");
 
         inputValue = mainPage
                 .openSearchInput()
                 .inputSearchText("Text")
                 .getSearchInputText();
 
-        assertEquals("Text", inputValue);
+        assertEquals("Text", inputValue, "Неверное значение в поисковой строке!");
     }
 
     @Test
     void searchInputCollapsingTest() {
         final MainPage mainPage = loginPage.login(BotCredentials.getBotCredentials());
+
         boolean isCollapsed = mainPage
                 .openSearchInput()
                 .inputSearchText("Text")
                 .collapseSearchInput()
                 .isSearchInputCollapsed();
 
-        assertTrue(isCollapsed);
+        assertTrue(isCollapsed, "Поисковая строка не закрылась!");
     }
 }
